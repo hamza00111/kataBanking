@@ -4,7 +4,7 @@ import com.kata.bank.domain.account.Amount;
 
 import java.util.Objects;
 
-public class Operation {
+public abstract class Operation {
 
     private String date;
     private Amount amount;
@@ -18,10 +18,6 @@ public class Operation {
         return balance.plus(amount);
     }
 
-    public String type() {
-        return amount.isNegative() ? "WITHDRAW" : "DEPOSIT";
-    }
-
     public String date() {
         return date;
     }
@@ -29,6 +25,8 @@ public class Operation {
     public String amount() {
         return amount.moneyFormat();
     }
+
+    public abstract String type();
 
     @Override
     public boolean equals(Object o) {

@@ -1,6 +1,8 @@
 package com.kata.bank.domain.account.operations.printer;
 
+import com.kata.bank.domain.account.operations.deposit.DepositOperation;
 import com.kata.bank.domain.account.operations.Operation;
+import com.kata.bank.domain.account.operations.withdrawal.WithdrawalOperation;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -13,6 +15,8 @@ import static org.mockito.Mockito.verify;
 
 public class OperationsHistoryPrinterTest {
 
+    public static final String FIRST_DAY = "10/10/2010";
+    public static final String SECOND_DAY = "12/10/2010";
     private OperationsHistoryPrinter operationsHistoryPrinter;
     @Mock private Console console;
 
@@ -68,10 +72,10 @@ public class OperationsHistoryPrinterTest {
     }
 
     private Operation depositOperation() {
-        return new Operation(amountOf(500), "10/10/2010");
+        return new DepositOperation(amountOf(500), FIRST_DAY);
     }
 
     private Operation withdrawalOperation() {
-        return new Operation(amountOf(150).negative(), "12/10/2010");
+        return new WithdrawalOperation(amountOf(150), SECOND_DAY);
     }
 }

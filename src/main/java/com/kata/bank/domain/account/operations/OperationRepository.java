@@ -2,6 +2,8 @@ package com.kata.bank.domain.account.operations;
 
 
 import com.kata.bank.domain.account.Amount;
+import com.kata.bank.domain.account.operations.deposit.DepositOperation;
+import com.kata.bank.domain.account.operations.withdrawal.WithdrawalOperation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,24 +11,21 @@ import java.util.List;
 
 public class OperationRepository {
 
-    private List<Operation> operations;
+    private List<Operation> operations = new ArrayList<>();
     private Clock clock;
 
     public OperationRepository(Clock clock) {
         this.clock = clock;
-        operations = new ArrayList();
     }
 
     public Operation addDeposit(Amount depositAmount) {
-        Operation deposit = operationOf(depositAmount);
-        this.operations.add(deposit);
-        return deposit;
+        Operation deposit = depositOperationOf(depositAmount);
+        return addOperation(deposit);
     }
 
     public Operation addWithdrawal(Amount withdrawalAmount) {
-        Operation withdrawal = operationOf(withdrawalAmount.negative());
-        this.operations.add(withdrawal);
-        return withdrawal;
+        Operation withdrawal = withdrawalOperationOf(withdrawalAmount);
+        return addOperation(withdrawal);
     }
 
     public List<Operation> allOperations() {
@@ -37,7 +36,16 @@ public class OperationRepository {
         return clock.todaysDateAsString();
     }
 
-    private Operation operationOf(Amount amount) {
-        return new Operation(amount, todaysDate());
+    private Operation depositOperationOf(Amount amount) {
+        return new DepositOperation(amount, todaysDate());
+    }
+
+    private Operation withdrawalOperationOf(Amount amount) {
+        return new WithdrawalOperation(amount, todaysDate());
+    }
+
+    private Operation addOperation(Operation operation) {
+        this.operations.add(operation);
+        return operation;
     }
 }

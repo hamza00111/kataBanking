@@ -1,4 +1,4 @@
-package com.kata.bank.domain.account.operations.exceptions;
+package com.kata.bank.domain.account.operations.withdrawal;
 
 import com.kata.bank.domain.account.Amount;
 

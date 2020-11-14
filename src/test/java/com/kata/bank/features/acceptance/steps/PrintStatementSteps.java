@@ -37,14 +37,14 @@ public class PrintStatementSteps {
     public void heDepositsEURToHisAccount(int deposit) {
         when(clock.todaysDateAsString())
                 .thenReturn("10/11/2020");
-        account.deposit(Amount.amountOf(Long.valueOf(deposit)));
+        account.deposit(of(deposit));
     }
 
     @And("he withdraws {int} EUR from his account")
     public void heWithdrawsEURFromHisAccount(int withdraw) {
         when(clock.todaysDateAsString())
                 .thenReturn("11/11/2020");
-        account.withdraw(Amount.amountOf(Long.valueOf(withdraw)));
+        account.withdraw(of(withdraw));
     }
 
     @When("he display operations history")
@@ -59,5 +59,9 @@ public class PrintStatementSteps {
         inOrder.verify(console).print("|OPERATION | DATE | AMOUNT | BALANCE|");
         inOrder.verify(console).print("|WITHDRAW | 11/11/2020 | -50.00 | 950.00|");
         inOrder.verify(console).print("|DEPOSIT | 10/11/2020 | 1000.00 | 1000.00|");
+    }
+
+    private Amount of(int value) {
+        return Amount.amountOf(Long.valueOf(value));
     }
 }

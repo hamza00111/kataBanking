@@ -11,7 +11,7 @@ import static com.kata.bank.domain.account.operations.printer.StatementLine.HEAD
 public class OperationsHistoryPrinter {
 
 
-    public static final int ON_TOP = 0;
+    private static final int ON_TOP = 0;
 
     private Console console;
     private List<String> statementLines = new ArrayList<>();

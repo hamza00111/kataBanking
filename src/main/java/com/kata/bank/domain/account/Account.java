@@ -1,7 +1,7 @@
 package com.kata.bank.domain.account;
 
-import com.kata.bank.domain.account.operations.exceptions.DepositOperationException;
-import com.kata.bank.domain.account.operations.exceptions.WithdrawalOperationException;
+import com.kata.bank.domain.account.operations.deposit.DepositOperationException;
+import com.kata.bank.domain.account.operations.withdrawal.WithdrawalOperationException;
 import com.kata.bank.domain.account.operations.Operation;
 import com.kata.bank.domain.account.operations.OperationRepository;
 import com.kata.bank.domain.account.operations.printer.OperationsHistoryPrinter;
@@ -26,8 +26,7 @@ public class Account {
 
         if(operation == null) throw new DepositOperationException(depositAmount);
 
-        updateBalanceAfter(operation);
-        operationsHistoryPrinter.addStatement(operation, balance);
+        calculateBalanceAndAddStatement(operation);
     }
 
     public void withdraw(Amount withdrawalAmount) {
@@ -35,8 +34,7 @@ public class Account {
 
         if(operation == null) throw new WithdrawalOperationException(withdrawalAmount);
 
-        updateBalanceAfter(operation);
-        operationsHistoryPrinter.addStatement(operation, balance);
+        calculateBalanceAndAddStatement(operation);
     }
 
     public void printHistory() {
@@ -45,6 +43,11 @@ public class Account {
 
     public Amount currentBalance() {
         return balance;
+    }
+
+    private void calculateBalanceAndAddStatement(Operation operation) {
+        updateBalanceAfter(operation);
+        operationsHistoryPrinter.addStatement(operation, balance);
     }
 
     private void updateBalanceAfter(Operation operation) {

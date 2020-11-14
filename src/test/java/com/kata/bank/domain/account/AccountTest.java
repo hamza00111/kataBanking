@@ -1,7 +1,9 @@
 package com.kata.bank.domain.account;
 
-import com.kata.bank.domain.account.operations.exceptions.DepositOperationException;
-import com.kata.bank.domain.account.operations.exceptions.WithdrawalOperationException;
+import com.kata.bank.domain.account.operations.deposit.DepositOperation;
+import com.kata.bank.domain.account.operations.withdrawal.WithdrawalOperation;
+import com.kata.bank.domain.account.operations.deposit.DepositOperationException;
+import com.kata.bank.domain.account.operations.withdrawal.WithdrawalOperationException;
 import com.kata.bank.domain.account.operations.Operation;
 import com.kata.bank.domain.account.operations.OperationRepository;
 import com.kata.bank.domain.account.operations.printer.OperationsHistoryPrinter;
@@ -40,60 +42,59 @@ public class AccountTest {
 
     @Test
     public void should_deposit_1000() {
-        Amount depositAmount = getAmount(1000);
-        Operation expectedOperation = new Operation(depositAmount, TODAY);
-        when(operationRepository.addDeposit(depositAmount))
+        Operation expectedOperation = depositOperationOf(of(1000));
+        when(operationRepository.addDeposit(of(1000)))
                 .thenReturn(expectedOperation);
 
-        account.deposit(depositAmount);
+        account.deposit(of(1000));
 
-        verify(operationRepository).addDeposit(getAmount(1000));
-        assertEquals(getAmount(1000), account.currentBalance());
+        verify(operationRepository).addDeposit(of(1000));
+        assertEquals(of(1000), account.currentBalance());
     }
 
     @Test
     public void should_deposit_500() {
-        Amount depositAmount = getAmount(500);
-        Operation expectedOperation = new Operation(depositAmount, TODAY);
+        Amount depositAmount = of(500);
+        Operation expectedOperation = depositOperationOf(depositAmount);
         when(operationRepository.addDeposit(depositAmount))
                 .thenReturn(expectedOperation);
 
-        account.deposit(getAmount(500));
+        account.deposit(of(500));
 
-        verify(operationRepository).addDeposit(getAmount(500));
-        assertEquals(getAmount(500), account.currentBalance());
+        verify(operationRepository).addDeposit(of(500));
+        assertEquals(of(500), account.currentBalance());
     }
 
     @Test
     public void should_withdraw_350() {
-        Amount withdrawalAmount = getAmount(350);
-        Operation expectedOperation = new Operation(withdrawalAmount.negative(), TODAY);
+        Amount withdrawalAmount = of(350);
+        Operation expectedOperation = withdrawalOperationOf(withdrawalAmount);
         when(operationRepository.addWithdrawal(withdrawalAmount))
                 .thenReturn(expectedOperation);
 
         account.withdraw(withdrawalAmount);
 
         verify(operationRepository).addWithdrawal(withdrawalAmount);
-        assertEquals(getAmount(-350), account.currentBalance());
+        assertEquals(of(-350), account.currentBalance());
     }
 
     @Test
     public void should_withdraw_1200() {
-        Amount withdrawalAmount = getAmount(1200);
-        Operation expectedOperation = new Operation(withdrawalAmount.negative(), TODAY);
+        Amount withdrawalAmount = of(1200);
+        Operation expectedOperation = withdrawalOperationOf(withdrawalAmount);
         when(operationRepository.addWithdrawal(withdrawalAmount))
                 .thenReturn(expectedOperation);
 
         account.withdraw(withdrawalAmount);
 
-        verify(operationRepository).addWithdrawal(getAmount(1200));
-        assertEquals(getAmount(-1200), account.currentBalance());
+        verify(operationRepository).addWithdrawal(of(1200));
+        assertEquals(of(-1200), account.currentBalance());
     }
 
     @Test
     public void should_add_statement_of_deposit_1000() {
-        Amount depositAmount = getAmount(1000);
-        Operation expectedOperation = new Operation(depositAmount, "11/11/2020");
+        Amount depositAmount = of(1000);
+        Operation expectedOperation = depositOperationOf(depositAmount);
         when(operationRepository.addDeposit(depositAmount))
                 .thenReturn(expectedOperation);
 
@@ -104,8 +105,8 @@ public class AccountTest {
 
     @Test
     public void should_add_statement_of_withdraw_1000() {
-        Amount withdrawalAmount = getAmount(1000);
-        Operation expectedOperation = new Operation(withdrawalAmount.negative(), "15/08/2020");
+        Amount withdrawalAmount = of(1000);
+        Operation expectedOperation = withdrawalOperationOf(withdrawalAmount);
         when(operationRepository.addWithdrawal(withdrawalAmount))
                 .thenReturn(expectedOperation);
 
@@ -119,7 +120,7 @@ public class AccountTest {
         expectedException.expect(DepositOperationException.class);
         expectedException.expectMessage("Deposit of 1000.00 failed. Please retry later.");
 
-        account.deposit(getAmount(1000));
+        account.deposit(of(1000));
         verify(operationsHistoryPrinter, times(0)).addStatement(any(), any());
     }
 
@@ -128,19 +129,19 @@ public class AccountTest {
         expectedException.expect(WithdrawalOperationException.class);
         expectedException.expectMessage("Withdrawal of 1000.00 failed. Please retry later.");
 
-        account.withdraw(getAmount(1000));
+        account.withdraw(of(1000));
         verify(operationsHistoryPrinter, times(0)).addStatement(any(), any());
     }
 
     @Test
     public void should_update_balance_after_each_operation() {
-        Amount depositAmount = getAmount(1000);
-        Operation expectedDepositOperation = new Operation(depositAmount, "10/08/2020");
+        Amount depositAmount = of(1000);
+        Operation expectedDepositOperation = depositOperationOf(depositAmount);
         when(operationRepository.addDeposit(depositAmount))
                 .thenReturn(expectedDepositOperation);
 
-        Amount withdrawalAmount = getAmount(500);
-        Operation expectedWithdrawalOperation = new Operation(withdrawalAmount.negative(), "15/08/2020");
+        Amount withdrawalAmount = of(500);
+        Operation expectedWithdrawalOperation = withdrawalOperationOf(withdrawalAmount);
         when(operationRepository.addWithdrawal(withdrawalAmount))
                 .thenReturn(expectedWithdrawalOperation);
 
@@ -161,7 +162,15 @@ public class AccountTest {
 
     }
 
-    private Amount getAmount(long value) {
+    private Operation depositOperationOf(Amount amount) {
+        return new DepositOperation(amount, TODAY);
+    }
+
+    private Operation withdrawalOperationOf(Amount amount) {
+        return new WithdrawalOperation(amount, TODAY);
+    }
+
+    private Amount of(long value) {
         return amountOf(value);
     }
 }
